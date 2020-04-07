@@ -1,5 +1,8 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
+    first_name varchar(10),
+    last_name varchar(15),
+    email varcar(15),
     username varchar(15),
     password varchar(15)
 );
@@ -8,8 +11,9 @@ CREATE TABLE todos (
     id SERIAL PRIMARY KEY,
     title varchar(20),
     description varchar(50),
-    dueDate DATE,
+    due_date DATE,
     user_id integer
+    is_complete
 );
 
 INSERT INTO users(username, password) VALUES ('peter', 'marcylabschool');
