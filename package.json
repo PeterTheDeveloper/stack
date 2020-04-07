@@ -1,0 +1,22 @@
+{
+  "name": "todo_list_api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PeterTheDeveloper/stack.git"
+  },
+  "author": "Peter Rose",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PeterTheDeveloper/stack/issues"
+  },
+  "homepage": "https://github.com/PeterTheDeveloper/stack#readme",
+  "dependencies": {
+    "pg": "^8.0.0"
+  }
+}
