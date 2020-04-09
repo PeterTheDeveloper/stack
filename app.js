@@ -14,6 +14,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(`${__dirname}/public`));
 
+app.use(userController.verify)
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '/views', 'index.html'));
 });
@@ -25,10 +27,10 @@ app.get('/login', userController.getLoginPage);
 
 // app.post('/userRegister', userController.createUser);
 
-// app.post('/verifyAndLoginUser', userController.verifyUser);
-
+app.post('/login', userController.loginUser)
 app.get('/todoList', userController.getTodoListPage);
 
+app.get('/logout', userController.getMainPage)
 // app.use(todo);
 
 

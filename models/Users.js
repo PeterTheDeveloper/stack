@@ -16,7 +16,7 @@ class User {
     }
     static getTodos(user_id) {
         const queryText = `SELECT todos.title, todos.description, todos.due_date, todos.is_complete                                            
-    FROM todos WHERE id  = $1;`;
+    FROM todos WHERE id = $1;`;
         return db.query(queryText, [user_Id])
             .then((data) => data.rows);
     }
