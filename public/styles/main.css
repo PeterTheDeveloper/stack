@@ -1,0 +1,19 @@
+body {
+    /*background-color: #000; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 100px 40px;
+}
+
+#title {
+    font-size: 25px;
+}
+
+#index-buttons {
+    display: flex;
+    justify-content: center;
+    
+    flex-direction: column;
+    margin: 15px;
+}
