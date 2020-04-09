@@ -1,7 +1,8 @@
 const path = require('path');
-const User = require('../models/Users');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const cookieParser =require("cookie-parser")
+const User = require('../models/Users');
 
 // Direct The User
 const getRegistrationPage = (req, res) => {
@@ -22,26 +23,66 @@ const getTodoListPage = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { name, email, plaintextPassword } = req.body;
+  const {
+    name,
+    email,
+    plaintextPassword,
+  } = req.body;
 
   const saltRounds = 8;
   bcrypt.hash(plaintextPassword, saltRounds)
     .then((hashedPassword) => {
       User.addUser(name, email, hashedPassword);
-    })
-    .then(data => {
-      res.send('User successfully created...');
-      // res.sendFile(path.join(__dirname ,'../views' , 'todoList.html'))
-      res.redirect('/todoList')
-    })
-    .catch((err) => {
-      res.status(500).res.send(err)
-    })
-    
-}
+    }).then(res.send('User successfully created...', 'todoList.html'))
+    .catch((err) => res.status(500).send(err));
+};
 
-const login = () => {
-  
-}
-    
-module.exports = { getRegistrationPage, getLoginPage, getMainPage, createUser,  getTodoListPage}
+const loginUser = async(req, res) => {
+
+  const {
+    email,
+    password
+  } = req.body;
+
+// Verify email exists
+  try {
+    const user = await User.getByEmail(email); // Returns table data in obj
+
+    if (!user) {
+      return res.send('User not found.');
+    }
+// Verify Password
+    const isValid = await bcrypt.compare(password, user.password); // return True/False
+
+    if (!isValid) {
+      return res.send('Incorrect password.');
+    }
+
+    const payload = {
+      email,
+      hashedPassword: user.password
+    };
+
+    jwt.sign(payload, 'secret', (err, hashedPayload) => {
+      if (err) {
+        console.log(err);
+        res.status(500).send(err);
+      }
+
+      console.log('JWT: ', hashedPayload);
+      res.cookie('LoginToken', hashedPayload).send('Logged in!');
+    });
+  } catch (err) {
+      console.log(err);
+      return res.send(err);
+  }
+};
+
+module.exports = {
+  getRegistrationPage,
+  getLoginPage,
+  getMainPage,
+  createUser,
+  loginUser,
+  getTodoListPage
+};

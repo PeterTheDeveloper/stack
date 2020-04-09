@@ -18,10 +18,6 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '/views', 'index.html'));
 });
 
-async (id) => {
-  const user = await User.get(username);
-}('bigs');
-
 app.get('/register', userController.getRegistrationPage);
 app.post('/register', userController.createUser);
 
