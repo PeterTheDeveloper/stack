@@ -6,7 +6,7 @@ class Todo {
     return db.query(queryText, [tite, description, dueDate, user_id]);
   }
 
-  static getAllUserTodos(user_Id) {
+  static getTodosById(user_Id) {
     const queryText = 'SELECT * FROM todos WHERE user_id = $1;';
     return db.query(queryText, [user_Id])
       .then((data) => data.rows);

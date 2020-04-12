@@ -1,7 +1,7 @@
 const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const cookieParser =require("cookie-parser")
+const cookieParser = require('cookie-parser');
 const User = require('../models/Users');
 
 // Direct The User
@@ -33,7 +33,7 @@ const createUser = (req, res) => {
         name,
         email,
         password,
-        exp: Math.floor(Date.now() / 1000) + (15 * 60), // 1 Hour expiration 
+        exp: Math.floor(Date.now() / 1000) + (15 * 60), // 1 Hour expiration
       }, 'Do Not Open', (err, encryptedPayload) => {
         res.cookie('userToken', encryptedPayload, { httpOnly: true });
         res.redirect('/todoList');
@@ -44,7 +44,7 @@ const createUser = (req, res) => {
     });
 };
 
-const loginUser = async(req, res) => {
+const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.getUserByEmail(email);
@@ -52,26 +52,23 @@ const loginUser = async(req, res) => {
       return res.status(403).send('User not found.');
     }
 
-    req.body.userId = user.id;
-
     const isValid = await bcrypt.compare(password, user.password);
 
-    if (isValid) {
-      return jwt.sign({
-        userId: user.id,
-        email,
-        password,
-        expiresIn: '1h',
-      }, 'Do Not Open', (err, encryptedPayload) => {
-        res.cookie('userToken', encryptedPayload, { httpOnly: true });
-        res.redirect('/todoList');
-      
-      });
+    if (!isValid) {
+      return res.send('incorrect password');
     }
 
-    return res.status(403).send('Email or password is incorrect.');
-  }
-  catch (err) {
+    const payload = { email, password, expiresIn: '1h' };
+
+    return jwt.sign(payload, 'secret', (err, hashedPayload) => {
+      if (err) {
+        console.log(err);
+        res.status(500).send(err);
+      }
+    });
+
+    return res.cookies('userToken', hashedPayload).send('You\'ve Logged in!');
+  } catch (err) {
     return res.send(err);
   }
 };
@@ -90,9 +87,9 @@ const verify = async (req, res, next) => {
   try {
     const user = jwt.verify(req.cookies.fakeAppToken, 'secret');
 
-    const { username, hashedPassword } = user;
+    const { email, hashedPassword } = user;
 
-    const searchedUser = await User.getByUsername(username);
+    const searchedUser = await User.getByEmail(email);
 
     if (!searchedUser) {
       return res.status(401).sllend('Unauthorized user.');
@@ -109,11 +106,17 @@ const verify = async (req, res, next) => {
   }
 };
 
+const logout = (req, res) => {
+  res.clearCookie('userToken');
+  res.redirect('/');
+};
+
 module.exports = {
   getRegistrationPage,
   getLoginPage,
   getMainPage,
   createUser,
   loginUser,
-  getTodoListPage
+  getTodoListPage,
+  logout,
 };
